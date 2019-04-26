@@ -1,0 +1,28 @@
+{
+    "name": "instantjay/sqlite-test-gen",
+    "description": "Small project for generating an SQLite file containing test data that were having issues with in SQFlite on Android but not iOS.",
+    "type": "project",
+    "require": {
+        "doctrine/dbal": "^2.9",
+        "php": "^7.3",
+        "symfony/stopwatch": "^4.2",
+        "monolog/monolog": "^1.24",
+        "symfony/filesystem": "^4.2",
+        "symfony/console": "^4.2"
+    },
+    "license": "UNLICENSED",
+    "authors": [
+        {
+            "name": "John Jensen",
+            "email": "john@jenseninnovations.se"
+        }
+    ],
+    "autoload": {
+        "psr-4": {"instantjay\\": "src"}
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "instantjay\\Tests\\": "tests"
+        }
+    }
+}
