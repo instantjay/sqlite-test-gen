@@ -15,44 +15,20 @@ class Generator
 {
     protected $stopwatch;
     protected $logger;
+    protected $rootDirPath;
 
-    protected const NAMES = [
-        'adam',
-        'ben',
-        'charlie',
-        'dawson',
-        'ernest',
-        'ferdinand',
-        'gunther',
-        'harold',
-        'ingram',
-        'jack',
-        'kevin',
-        'lex',
-        'martin',
-        'nick',
-        'olaf',
-        'patric'
-    ];
-
-    protected const TAG_NAMES = [
-        'smart',
-        'beautiful',
-        'slow',
-        'smelly',
-        'good-looking',
-        'clever',
-        'curious',
-        'intelligent',
-        'annoying',
-        'self-centered'
-    ];
+    protected const DESIRED_USER_ENTRIES = 2500;
+    protected const DESIRED_MIN_TAG_ASSOCS = 1;
+    protected const DESIRED_MAX_TAG_ASSOCS = 1;
 
     public function __construct()
     {
         //
         $this->stopwatch = new Stopwatch();
         $this->stopwatch->start('init');
+
+        //
+        $this->rootDirPath = dirname(__DIR__);
 
         //
         $this->logger = new Logger('sqlite');
@@ -162,18 +138,18 @@ class Generator
             $tagCount = $this->insertTags($connection);
             $tagMaxId = $tagCount - 1;
 
-            $desiredUserObjectCount = 100000;
+            $desiredUserObjectCount = self::DESIRED_USER_ENTRIES;
 
             for ($i = 0; $i <= $desiredUserObjectCount; $i++) {
                 $userId = $this->insertUser($connection);
 
-                if (random_int(0, 1)) {
+                $userTagCount = random_int(self::DESIRED_MIN_TAG_ASSOCS, self::DESIRED_MAX_TAG_ASSOCS);
+
+                for ($ti = 0; $ti <= $userTagCount; $ti++) {
                     $tagId = random_int(0, $tagMaxId);
-                    $rank = random_int(0, 9);
+                    $rank = random_int(0, 9); // Set a ranking between 0-9 for this association.
 
                     $this->associateUserWithTag($connection, $userId, $tagId, $rank);
-
-                    //$this->logger->log(Logger::DEBUG, 'Associated User ' . $userId . ' with Tag ' . $tagId . ' (Rank ' . $rank . ')');
                 }
             }
 
@@ -199,8 +175,11 @@ class Generator
 
         $qb->insert('users');
 
-        $randomNameId = array_rand(self::NAMES);
-        $randomName = self::NAMES[$randomNameId];
+        $fileContents = file_get_contents($this->rootDirPath . '/config/names.json');
+        $names = json_decode($fileContents);
+
+        $randomNameId = array_rand($names);
+        $randomName = $names[$randomNameId];
 
         $values = [
             'name' => ':name',
@@ -221,7 +200,10 @@ class Generator
     {
         $qb = new QueryBuilder($connection);
 
-        foreach (self::TAG_NAMES as $name) {
+        $fileContents = file_get_contents($this->rootDirPath . '/config/labels.json');
+        $labels = json_decode($fileContents);
+
+        foreach ($labels as $name) {
             $qb->insert('tags');
 
             $values = [
@@ -233,7 +215,7 @@ class Generator
             $qb->execute();
         }
 
-        return count(self::TAG_NAMES);
+        return count($labels);
     }
 
     protected function associateUserWithTag(Connection $connection, int $userId, int $tagId, int $rank = 0): void

@@ -8,7 +8,8 @@
         "symfony/stopwatch": "^4.2",
         "monolog/monolog": "^1.24",
         "symfony/filesystem": "^4.2",
-        "symfony/console": "^4.2"
+        "symfony/console": "^4.2",
+        "ext-json": "^1.7"
     },
     "license": "UNLICENSED",
     "authors": [
