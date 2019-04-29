@@ -120,26 +120,34 @@ class Generator
         $connection->exec('
             CREATE TABLE users (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name varchar(64) NOT NULL
+                name varchar(64) NOT NULL,
+                CONSTRAINT unique_user_id UNIQUE (id)
             )
         ');
+
+        $connection->exec('CREATE INDEX user_id_index ON users (id)');
 
         $connection->exec('
             CREATE TABLE tags (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                title varchar(64) NOT NULL
+                title varchar(64) NOT NULL,
+                CONSTRAINT unique_tag_id UNIQUE (id)
             )
         ');
+
+        $connection->exec('CREATE INDEX tag_id_index ON tags (id)');
 
         $connection->exec('
             CREATE TABLE user_tags (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 user_id int(11) NOT NULL,
                 tag_id int(11) NOT NULL,
-                rank int(1) NOT NULL DEFAULT 0
+                rank int(1) NOT NULL DEFAULT 0,
+                CONSTRAINT unique_user_tag_id UNIQUE (id)
             )
         ');
 
+        $connection->exec('CREATE INDEX user_tag_id_index ON user_tags (id)');
         $connection->exec('CREATE INDEX ut_uid_index ON user_tags (user_id)');
         $connection->exec('CREATE INDEX ut_tid_index ON user_tags (tag_id)');
         $connection->exec('CREATE INDEX ut_rank_index ON user_tags (rank)');
